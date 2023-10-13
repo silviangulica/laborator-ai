@@ -1,1 +1,1 @@
-# laborator-ai
+# Laborator AI
