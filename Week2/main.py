@@ -57,13 +57,11 @@ def is_state_final(state):
 def make_one_move(state, neighbour_node_position):
     new_state = {}
     neighbour_to_be_moved = state['matrix'][neighbour_node_position[0]][neighbour_node_position[1]]
-    
-    print(neighbour_to_be_moved)
-    print(state['last_moved_cell_value'])
+   
     if(validate(state, neighbour_to_be_moved) == False):
         return None
     
-    new_state['matrix'] = state['matrix']
+    new_state['matrix'] =[row.copy() for row in state['matrix']]
     new_state['last_moved_cell_value'] = neighbour_to_be_moved
     swap_values(new_state['matrix'], state['position_of_zero'], neighbour_node_position)
     new_state['position_of_zero'] = neighbour_node_position
@@ -98,17 +96,18 @@ def depth_limited_DFS(state, depth, visited):
     if depth == 0:
         return None
     visited.append(state)
+
     for neighbour_position in state['neighbours'][0]:
         neighbour_state = make_one_move(state, neighbour_position)
        
         if(neighbour_state == None):
             continue
         
-        print(neighbour_state)
-        print(neighbour_state['matrix'][0])
-        print(neighbour_state['matrix'][1])
-        print(neighbour_state['matrix'][2])
-        print('----------------')
+      
+        # print(neighbour_state['matrix'][0])
+        # print(neighbour_state['matrix'][1])
+        # print(neighbour_state['matrix'][2])
+   
         if neighbour_state not in visited:
             result = depth_limited_DFS(neighbour_state, depth - 1, visited)
             if result != None:
@@ -116,11 +115,11 @@ def depth_limited_DFS(state, depth, visited):
     return None
           
 
-# 0 2 1
-# 3 4 5
-# 6 7 8
+# 8 6 7
+# 2 5 4
+# 0 3 1
 
 # matrixxx=make_one_move(init_state([8, 6, 0, 5, 4, 7, 2, 3, 1]), (0,1))
 
-print(iddfs(init_state([0, 2, 1, 3, 4, 5, 6, 7, 8]),15))
+print(iddfs(init_state( [2, 5, 3, 1, 0, 6, 4, 7, 8]),25))
 # print(matrixxx['matrix'])
