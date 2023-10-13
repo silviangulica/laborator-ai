@@ -1,7 +1,7 @@
 
 # Laborator AI
 
-Acest repo stocheaza munca noastra (a colaboratorilor) la laboratorul de AI.
+Acest repo stocheaza munca noastra (a colaboratorilor) la laboratorul de AI, grupa A4.
 
 
 ## Progres so far
