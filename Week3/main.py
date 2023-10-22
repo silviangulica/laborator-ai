@@ -3,7 +3,7 @@ from icecream import ic
 
 # 1. Reprezentarea starii
 
-state = {
+info_state = {
     "matrix": [[8, 6, 0], [5, 4, 7], [2, 3, 1]],
     "last_moved_cell_value": -1,
     "position_of_zero": (0, 2),
@@ -12,9 +12,7 @@ state = {
 
 # 2. Stari speciale + functia de intializare  + functia booleana de verificare a starii finale
 def init_state(vector):
-    state = {}
-    state["matrix"] = [vector[0:3], vector[3:6], vector[6:9]]
-    state["last_moved_cell_value"] = -1
+    state = {"matrix": [vector[0:3], vector[3:6], vector[6:9]], "last_moved_cell_value": -1}
     state["position_of_zero"] = find_position_of_zero(state["matrix"])
     return state
 
@@ -41,8 +39,8 @@ def find_position_of_zero(matrix):
     for i in range(0, 3):
         for j in range(0, 3):
             if matrix[i][j] == 0:
-                return (i, j)
-    return (-1, -1)
+                return i, j
+    return -1, -1
 
 
 def is_state_final(state):
@@ -63,7 +61,7 @@ def make_one_move(state, neighbour_node_position):
         neighbour_node_position[1]
     ]
 
-    if validate(state, neighbour_to_be_moved) == False:
+    if not validate(state, neighbour_to_be_moved):
         return None
 
     new_state["matrix"] = [row.copy() for row in state["matrix"]]
@@ -88,17 +86,17 @@ def validate(state, neighbour_to_be_moved):
 
 
 # 4. IDDFS
-def iddfs(init_state, max_depth):
+def iddfs(start_state, max_depth):
     for depth in range(0, max_depth):
         visited = set()
-        solution = depth_limited_DFS(init_state, depth, visited)
-        if solution != None:
+        solution = depth_limited_dfs(start_state, depth, visited)
+        if solution is not None:
             return solution
 
     return None
 
 
-def depth_limited_DFS(state, depth, visited):
+def depth_limited_dfs(state, depth, visited):
     if is_state_final(state):
         return state
     if depth == 0:
@@ -108,12 +106,12 @@ def depth_limited_DFS(state, depth, visited):
     for neighbour_position in construct_neighbour_of_zero_list(state):
         neighbour_state = make_one_move(state, neighbour_position)
 
-        if neighbour_state == None:
+        if neighbour_state is None:
             continue
 
         if str(neighbour_state) not in visited:
-            result = depth_limited_DFS(neighbour_state, depth - 1, visited)
-            if result != None:
+            result = depth_limited_dfs(neighbour_state, depth - 1, visited)
+            if result is not None:
                 return result
     return None
 
