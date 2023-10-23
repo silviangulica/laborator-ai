@@ -1,6 +1,4 @@
 from icecream import ic
-
-
 # 1. Reprezentarea starii
 
 info_state = {
@@ -12,7 +10,8 @@ info_state = {
 
 # 2. Stari speciale + functia de intializare  + functia booleana de verificare a starii finale
 def init_state(vector):
-    state = {"matrix": [vector[0:3], vector[3:6], vector[6:9]], "last_moved_cell_value": -1}
+    state = {"matrix": [vector[0:3], vector[3:6],
+                        vector[6:9]], "last_moved_cell_value": -1}
     state["position_of_zero"] = find_position_of_zero(state["matrix"])
     return state
 
@@ -89,19 +88,23 @@ def validate(state, neighbour_to_be_moved):
 def iddfs(start_state, max_depth):
     for depth in range(0, max_depth):
         visited = set()
-        solution = depth_limited_dfs(start_state, depth, visited)
+        order_of_moves = []
+        solution = depth_limited_dfs(
+            start_state, depth, visited, order_of_moves)
         if solution is not None:
-            return solution
+            return solution, order_of_moves
 
-    return None
+    return None, None
 
 
-def depth_limited_dfs(state, depth, visited):
+def depth_limited_dfs(state, depth, visited, order_of_moves):
     if is_state_final(state):
+        order_of_moves.append(state['matrix'])
         return state
     if depth == 0:
         return None
     visited.add(str(state))
+    order_of_moves.append(state['matrix'])
 
     for neighbour_position in construct_neighbour_of_zero_list(state):
         neighbour_state = make_one_move(state, neighbour_position)
@@ -110,20 +113,27 @@ def depth_limited_dfs(state, depth, visited):
             continue
 
         if str(neighbour_state) not in visited:
-            result = depth_limited_dfs(neighbour_state, depth - 1, visited)
+            result = depth_limited_dfs(
+                neighbour_state, depth - 1, visited, order_of_moves)
             if result is not None:
                 return result
+
+    order_of_moves.pop()
     return None
 
 
 # [8, 6, 7, 2, 5, 4, 0, 3, 1]         [2, 5, 3, 1, 0, 6, 4, 7, 8]        [2, 7 , 5, 0, 8, 4, 3, 1, 6].
 ex_one_state = iddfs(init_state([8, 6, 7, 2, 5, 4, 0, 3, 1]), 30)
-ic("First:" + str(ex_one_state['matrix']))
-
-
-ex_two_state = iddfs(init_state([2, 5, 3, 1, 0, 6, 4, 7, 8]), 30)
-ic("Second" + str(ex_two_state['matrix']))
-
-
-ex_thr_state = iddfs(init_state([2, 7, 5, 0, 8, 4, 3, 1, 6]), 30)
-ic("Third:" + str(ex_thr_state['matrix']))
+ic("First:" + str(ex_one_state[0]['matrix']))
+for i in ex_one_state[1]:
+    for j in i:
+        print(j)
+    print("")
+#
+#
+# ex_two_state = iddfs(init_state([2, 5, 3, 1, 0, 6, 4, 7, 8]), 30)
+# ic("Second" + str(ex_two_state['matrix']))
+#
+#
+# ex_thr_state = iddfs(init_state([2, 7, 5, 0, 8, 4, 3, 1, 6]), 30)
+# ic("Third:" + str(ex_thr_state['matrix']))
