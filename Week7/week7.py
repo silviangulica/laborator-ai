@@ -1,6 +1,7 @@
 
 import random
-import math
+import numpy as np
+
 date_antrenare = []
 date_testare = []
 
@@ -9,6 +10,7 @@ with open("seeds_dataset.txt", "r") as f:
         line = line.strip()
         line = line.split()
         line = [float(x) for x in line]
+        line = [line[:-1], line[-1]]
         date_antrenare.append(line)
 
 
@@ -17,48 +19,42 @@ nr_testare = int(len(date_antrenare) * 0.2)
 date_testare = date_antrenare[:nr_testare]
 date_antrenare = date_antrenare[nr_testare:]
 
-# now, for the next part we will train a neural netowork for forward propagation
+
+# Ex 2.
+weights_1 = np.random.uniform(-1, 1, (7, 9))
+weights_2 = np.random.uniform(-1, 1, (9, 5))
+weights_3 = np.random.uniform(-1, 1, (5, 3))
+
+bias_1 = np.random.uniform(-1, 1, (1, 9))
+bias_2 = np.random.uniform(-1, 1, (1, 5))
+bias_3 = np.random.uniform(-1, 1, (1, 3))
+
+number_of_epochs = 500
+learning_rate = 0.1
 
 
-def init_network(nr_inputs, nr_hidden, nr_outputs):
-    network = []
-    hidden_layer = [{'weights': [random.random() for i in range(nr_inputs + 1)]}
-                    for i in range(nr_hidden)]
-    network.append(hidden_layer)
-    output_layer = [{'weights': [random.random() for i in range(nr_hidden + 1)]}
-                    for i in range(nr_outputs)]
-    network.append(output_layer)
-    return network
+# Ex 3.
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
 
-def activate(weights, inputs):
-    activation = weights[-1]
-    for i in range(len(weights) - 1):
-        activation += weights[i] * inputs[i]
-    return activation
+def sigmoid_derivative(x):
+    return sigmoid(x) * (1 - sigmoid(x))
 
 
-def transfer(activation):
-    return 1.0 / (1.0 + math.exp(-activation))
+def error(output, expected):
+    return np.power(output - expected, 2)
 
 
-def forward_propagate(network, row):
-    inputs = row
-    for layer in network:
-        new_inputs = []
-        for neuron in layer:
-            activation = activate(neuron['weights'], inputs)
-            neuron['output'] = transfer(activation)
-            new_inputs.append(neuron['output'])
-        inputs = new_inputs
-    return inputs
+# Ex 4.
 
 
+def feed_forward(input, weights, bias):
+    return sigmoid(np.dot(input, weights) + bias)
 
-# print("Date de antrenare: ", date_antrenare)
-# print("Date de testare: ", date_testare)
-network = init_network(7, 5, 3)
-print("Network: ", network)
-for row in date_antrenare:
-    outputs = forward_propagate(network, row)
-    print(outputs)
+
+for input in date_antrenare:
+    output = feed_forward(input[0], weights_1, bias_1)
+    output = feed_forward(output, weights_2, bias_2)
+    output = feed_forward(output, weights_3, bias_3)
+    print(output)
