@@ -1,5 +1,5 @@
 import random
-
+import matplotlib.pyplot as plt
 import numpy as np
 
 date_antrenare = []
@@ -46,7 +46,9 @@ def mse (actual_output, predicted_output):
 def feed_forward(input, weights, bias):
     return sigmoid(np.dot(input, weights) + bias)
 
-for epoch in range(number_of_epochs):
+
+epoch_errors_to_plot = []
+for epoch in range(1,number_of_epochs+1):
     epoch_error = 0
     for sample in date_antrenare:
         input = np.array([sample[0]])
@@ -68,17 +70,27 @@ for epoch in range(number_of_epochs):
         weights_2 = weights_2 + learning_rate * np.dot(layer1_output.T, gradients_2)
         weights_3 = weights_3 + learning_rate * np.dot(layer2_output.T, gradients_3)
         
-        bias_1 = bias_1 + learning_rate * np.sum(gradients_1, axis=0, keepdims=True)
-        bias_2 = bias_2 + learning_rate * np.sum(gradients_2, axis=0, keepdims=True)
-        bias_3 = bias_3 + learning_rate * np.sum(gradients_3, axis=0, keepdims=True)
+        bias_1 = bias_1 + learning_rate * gradients_1
+        bias_2 = bias_2 + learning_rate * gradients_2
+        bias_3 = bias_3 + learning_rate * gradients_3
+        
+    epoch_errors_to_plot.append(epoch_error)
         
     if(epoch % 50 == 0):
         print(f"Epoch {epoch} completed. Error: {epoch_error}") 
         
+plt.plot(range(1, number_of_epochs+1), epoch_errors_to_plot, label="Training Error")
+plt.xlabel('Epoch')
+plt.ylabel('Error')
+plt.title('Training Error over Epochs')
+plt.legend()
+plt.show()
+        
 
 
 
-corecte = 0
+correct = []
+wrong = []
 for sample in date_testare:
     input = np.array([sample[0]])
     actual_output = np.zeros(number_of_output_neurons)
@@ -91,19 +103,17 @@ for sample in date_testare:
  
     if (actual_output[np.argmax(output)] == 1):
         print(f"Predicted: {np.argmax(output) + 1} Actual: {actual_output} " + "Corect")
-        corecte +=1
+        correct.append(sample)
     else:
         print(f"Predicted: {np.argmax(output) + 1} Actual: {actual_output} " + "Gresit") 
-
-# for some reason mereu cand il rulezi o sa ai acc diferita ptt ca vad
-# ca tine f mult de cum is randomizate datele la inceput adica uneori
-# se poate antrena mai bine ,alteori mai prost , caz in care prob ar trb un nr de epoci mai mare  
-# Gen are cazuri cand eroarea abia scade si acolo o sa fie probleme
-# si cazuri in care scade mult si calculeaza mai bine weighturile si biasurile    
-
-## incearca sa rulezi de mai multe ori si o sa vezi ca uneori e totu ok, alteori nu i asa buna acuratetea dar in mare cazuri
-# la mine ( in majoritatea cazurilor) acuratetea e >0.7
+        wrong.append(sample)
 
 
-# sterge comentariile astea dupa ce ai citit
-print(f"Accuracy: {corecte / len(date_testare)}")
+print(f"Accuracy: {len(correct) / len(date_testare)}")
+plt.plot([x[0][0] for x in correct], [x[0][1] for x in correct], 'go', label="Corect")
+plt.plot([x[0][0] for x in wrong], [x[0][1] for x in wrong], 'ro', label="Gresit")
+plt.xlabel('Atribute 1')
+plt.ylabel('Atribute 2')
+plt.title('Corect vs Gresit')
+plt.legend()
+plt.show()
